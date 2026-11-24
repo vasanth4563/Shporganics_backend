@@ -33,6 +33,12 @@ class Settings(BaseSettings):
             port = self.DB_PORT or 5432
             self.DATABASE_URL = f"postgresql+psycopg2://{self.DB_USER}:{self.DB_PASSWORD}@{host}:{port}/{self.DB_NAME}"
 
+        # Normalize postgres driver for SQLAlchemy 2.0 + psycopg2
+        if self.DATABASE_URL.startswith("postgres://"):
+            self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql+psycopg2://", 1)
+        elif self.DATABASE_URL.startswith("postgresql://") and not self.DATABASE_URL.startswith("postgresql+"):
+            self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
+
         # If JWT_SECRET is provided, use it as JWT_SECRET_KEY
         if self.JWT_SECRET:
             self.JWT_SECRET_KEY = self.JWT_SECRET

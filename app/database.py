@@ -20,7 +20,8 @@ def ensure_database_exists():
         parsed = urlparse(clean_url)
         target_db = parsed.path.lstrip("/")
 
-        if not target_db:
+        # Only attempt database auto-creation for local development PostgreSQL
+        if not target_db or parsed.hostname not in ("localhost", "127.0.0.1", None):
             return
 
         conn = psycopg2.connect(
